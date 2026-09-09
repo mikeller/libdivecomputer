@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "platform.h"
@@ -118,4 +119,17 @@ dc_field_get(dc_field_cache_t *cache, dc_field_type_t type, unsigned int flags, 
 	}
 
 	return DC_STATUS_UNSUPPORTED;
+}
+
+/*
+ * Free all strdup'd string values in the cache.  The desc pointers are
+ * static allocations and must not be freed.  Safe to call on a
+ * zero-initialised cache (free(NULL) is a no-op).
+ */
+void dc_field_cache_free(dc_field_cache_t *cache)
+{
+	for (int i = 0; i < MAXSTRINGS; i++) {
+		free((void *) cache->strings[i].value);
+		cache->strings[i].value = NULL;
+	}
 }
